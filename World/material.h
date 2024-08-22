@@ -19,6 +19,7 @@ class Material
 	//material properties
 	Phase _phase;
 	float _density;
+	bool _slippery = false; //will this material slide over itself?
 
 	//color properties - color values fall in these ranges 
 	sf::Color _col_min;
@@ -26,7 +27,7 @@ class Material
 
 public: 
 
-	Material(MaterialID id, Phase phase, float density, sf::Color col_min, sf::Color col_max);
+	Material(MaterialID id, Phase phase, float density, sf::Color col_min, sf::Color col_max, bool slippery = false);
 
 	MaterialID id() const { return _id; }
 	Phase phase() const { return _phase; }

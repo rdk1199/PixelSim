@@ -8,7 +8,7 @@
 struct Particle 
 {
 	//intrinsic properties
-	MaterialID material;
+	const Material* material; //holds pointer to something in material table
 	sf::Color color;
 
 
@@ -18,8 +18,7 @@ struct Particle
 	//bookkeeping
 	bool updated = false; 
 
-	Particle(const Material& mat) : material(mat.id()), color(mat.make_color()), velocity({ 0,0 }) {}
-	Particle() : material(MaterialID::air), color(sf::Color{ 0,0,0 }), velocity({ 0,0 }) {}
-
-
+	Particle(const Material& mat) : material(&mat), color(mat.make_color()), velocity({ 0,0 }) {}
+	
 };
+
