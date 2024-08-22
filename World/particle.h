@@ -13,10 +13,13 @@ struct Particle
 
 
 	//dynamic properties
-	vec2 velocity;
+	vec2 velocity; // m/s 
 
-	Particle(const Material& mat) : material(mat.id()), color(mat.make_color()) {}
-	Particle() : material(MaterialID::air), color(sf::Color{ 0,0,0 }) {}
+	//bookkeeping
+	bool updated = false; 
+
+	Particle(const Material& mat) : material(mat.id()), color(mat.make_color()), velocity({ 0,0 }) {}
+	Particle() : material(MaterialID::air), color(sf::Color{ 0,0,0 }), velocity({ 0,0 }) {}
 
 
 };

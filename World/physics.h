@@ -2,6 +2,7 @@
 
 #include "../Math/math.h"
 
-const vec2 g{ 0, -9.8 };
+//CONSTANTS
+const vec2 g{ 0, -9.8 }; //m/s^2
 
 
