@@ -31,6 +31,7 @@ public:
 
 	MaterialID id() const { return _id; }
 	Phase phase() const { return _phase; }
+	bool slippery() const { return _slippery; }
 	sf::Color make_color() const { return _col_min; }
 
 };

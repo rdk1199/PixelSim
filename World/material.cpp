@@ -12,7 +12,7 @@ Material::Material(MaterialID id, Phase phase, float density, sf::Color col_min,
 MaterialTable::MaterialTable() //put all material properties here
 {
 	Material air(MaterialID::air, Phase::gas, 1.293, { 1,0,0}, { 1,0,0});
-	Material sand(MaterialID::sand, Phase::solid, 1500, { 225, 255, 225 }, { 225, 255, 225 }, true);
+	Material sand(MaterialID::sand, Phase::solid, 1500, { 255, 255, 225 }, { 255, 255, 225 }, true);
 
 
 	//these should be added in the SAME ORDER as in the enum

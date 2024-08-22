@@ -11,6 +11,10 @@ int main()
 
     WorldGrid world(1600, 900);
 
+    vector<pixel> line_1 = compute_line({ 798, 450 }, { 798, 899 });
+    vector<pixel> line_2 = compute_line({ 799, 450 }, { 799, 899 });
+    vector<pixel> line_3 = compute_line({ 801, 450 }, { 801, 899 });
+    vector<pixel> line_4 = compute_line({ 802, 450 }, { 802, 899 });
     vector<pixel> line = compute_line({ 800, 450 }, { 800, 899 });
 
     //world.insert_particle(1599, 899, MaterialID::sand);
@@ -18,6 +22,10 @@ int main()
     for (int i = 0; i < line.size(); i++)
     {
         world.insert_particle(line[i].x, line[i].y, MaterialID::sand);
+        world.insert_particle(line_1[i].x, line[i].y, MaterialID::sand);
+        world.insert_particle(line_2[i].x, line[i].y, MaterialID::sand);
+        world.insert_particle(line_3[i].x, line[i].y, MaterialID::sand);
+        world.insert_particle(line_4[i].x, line[i].y, MaterialID::sand);
     }
 
     /*

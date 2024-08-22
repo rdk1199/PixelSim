@@ -2,10 +2,12 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <ctime>
 
 #include "grid.h"
 #include "physics.h"
 #include "material.h"
+#include "../Math/rand_util.h"
 
 using std::cout;
 using std::endl;
@@ -17,8 +19,8 @@ WorldGrid::WorldGrid(int width, int height, float scale):
 	_scale(scale),
 	mat_table(MaterialTable())
 {
+	rand_init(time(0));
 	grid.resize(width, vector<Particle>(height, Particle(mat_table[MaterialID::air])));
-	
 }
 
 void WorldGrid::insert_particle(int x, int y, MaterialID mat)
@@ -55,29 +57,75 @@ pixel WorldGrid::compute_desired_pos(int x, int y, float time_step, const Partic
 	return { new_x, new_y };
 }
 
-pixel WorldGrid::compute_collisions(pixel curr_px, float time_step, Particle& particle) //does collision math -> computes new velocity of particle and final position - could add bouncing later!
+void WorldGrid::enforce_boundary(pixel final_pos, Particle& particle)
+{
+//kill velocity in direction of boundaries when they impact
+	if ((final_pos.x == 0 && particle.velocity.x < 0) || (final_pos.x == _width - 1 && particle.velocity.x >0))
+	{
+		particle.velocity.x = 0;
+	}
+
+	if ((final_pos.y == 0 && particle.velocity.y < 0) || (final_pos.y == _height - 1 && particle.velocity.y >0))
+	{
+		particle.velocity.y = 0;
+	}
+
+}
+
+pixel WorldGrid::handle_collisions(vector<pixel> path, float time_step, Particle& particle) //moves particle along path until it finds a collision (or doesn't) // path is assumed to be nonempty
+{
+	if (path.empty())
+	{
+		cout << " ERROR: handle_collisions passed empty path" << endl;
+		exit(1);
+	}
+
+	pixel out = path.back(); //if no collision is found, out will be the last particle -> this covers case where path is size 1 as well, since next loop is skipped i n
+
+	for (int i = 1; i < path.size(); i++) //look at all positions in order from start (not including start)
+	{
+		if (grid[path[i].x][path[i].y].material->phase() == Phase::solid) //found a collision
+		{
+
+			//implement sliding and velocity adjustment here 
+
+			pixel collision_px = path[i];
+		
+			//adjust velocity of particle (just one for now)
+
+			if (particle.material->slippery()) //randomly rotate velocity (deflect) and reduce magnitude by half
+			{
+				int angle = g_rand.rand_int(30, 45); //randomly choose a deflection angle
+				particle.velocity = 0.25f * (g_rand.flip() ? particle.velocity.rotated(angle) : particle.velocity.rotated(-angle)); //randomly pick a deflection direction
+			}
+
+			else //just kill velocity for now
+			{
+				particle.velocity = { 0,0 };
+			}
+
+			//
+
+
+			out = path[i - 1]; //last known "good" position
+			break;
+		}
+	}
+
+	//
+	enforce_boundary(out, particle);
+	return out;
+}
+
+pixel WorldGrid::compute_final_pos(pixel curr_px, float time_step, Particle& particle) //does collision math -> computes new velocity of particle and final position - could add bouncing later!
 {
 	pixel desired_px = compute_desired_pos(curr_px.x, curr_px.y, time_step, particle);
 
 	//check every pixel along the "line" from current position to desired position until a collision occurs with another solid particle -> move there, kill velocity component in that direction
 
-	vector<pixel> line = compute_line(curr_px, desired_px); 
+	vector<pixel> path = compute_line(curr_px, desired_px); 
 
-	if (line.size() == 1) //current and desired are the same -> don't do anything
-	{
-		return curr_px;
-	}
-
-	for (int i = 1; i < line.size(); i++) //look at all positions in order from start (not including start)
-	{
-		if (grid[line[i].x][line[i].y].material->phase() == Phase::solid) //found a collision
-		{
-			return line[i - 1]; //last known "good" position
-		}
-	}
-
-	//no collision found - don't modify velocity and return desired position
-	return desired_px;
+	return handle_collisions(path, time_step, particle);
 }
 
 void WorldGrid::move_particle(int x, int y, float time_step) //applies current velocity of particle over one timestep -does not yet consider collision
@@ -88,7 +136,7 @@ void WorldGrid::move_particle(int x, int y, float time_step) //applies current v
 	}
 
 	Particle& particle = grid[x][y];
-	pixel new_pos = compute_collisions({ x, y }, time_step, particle);
+	pixel new_pos = compute_final_pos({ x, y }, time_step, particle);
 
 	//move particle to new position
 	particle.updated = true;

@@ -5,6 +5,10 @@
 
 using std::vector;
 
+vec2 vec2::project_along(const vec2& dir)
+{
+	return ((*this * dir) / (dir * dir)) * dir;
+}
 
 vector<pixel> compute_line(pixel start_px, pixel end_px) //it is assumed these are valid pixels i.e. not out of bounds
 {
