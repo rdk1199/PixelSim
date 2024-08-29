@@ -23,7 +23,7 @@ struct vec2
 
 	vec2 rotated(float angle) const { angle = angle * (3.1415927 / 180.0f);  return { x * cos(angle) - y * sin(angle) , x * sin(angle) + y * cos(angle) }; } //rotates vector by angle DEGREES
 
-	vec2 project_along(const vec2& dir);
+	vec2 project_along(const vec2& dir); //returns component in direction of dir
 
 };
 
@@ -38,6 +38,16 @@ inline vec2& operator +=(vec2& a, const vec2& b)
 	return a;
 }
 
+inline vec2 operator-(const vec2& a, const vec2& b)
+{
+	return { a.x - b.x, a.y - b.y };
+}
+
+inline vec2& operator -=(vec2& a, const vec2& b)
+{
+	a = a - b;
+	return a;
+}
 inline vec2 operator*(float c, const vec2& v)
 {
 	return { c * v.x, c * v.y };

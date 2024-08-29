@@ -59,7 +59,7 @@ pixel WorldGrid::compute_desired_pos(int x, int y, const Particle& particle)
 
 void WorldGrid::enforce_boundary(pixel final_pos, Particle& particle)
 {
-//kill velocity in direction of boundaries when they impact -> this could become more interesting later
+//kill velocity in direction of boundaries when they impact -> this could become more interesting later (bouncing or something)
 	if ((final_pos.x == 0 && particle.velocity.x < 0) || (final_pos.x == _width - 1 && particle.velocity.x >0))
 	{
 		particle.velocity.x = 0;
@@ -79,40 +79,76 @@ void WorldGrid::handle_ss_collision(pixel start_px, pixel coll_px)
 	Particle& particle = grid[start_px.x][start_px.y];
 	Particle& collided_particle = grid[coll_px.x][coll_px.y];
 
-	//adjust velocity of particle (just one for now)
+	//adjust velocity of particle
 
 	if (particle.material->slippery()) //randomly rotate velocity (deflect) and reduce magnitude by half
 	{
-		int angle = g_rand.rand_int(30, 45); //randomly choose a deflection angle
+		int angle = g_rand.rand_int(30, 60); //randomly choose a deflection angle
+
+		particle.velocity = .25f * (g_rand.flip() ? particle.velocity.rotated(angle) : particle.velocity.rotated(-angle)); //randomly pick a deflection direction
 
 		if (!collided_particle.material->fixed())
 		{
 			collided_particle.velocity += 0.25f * particle.velocity; //impacted particle gets bumped as well
 		}
-
-		particle.velocity = .25f * (g_rand.flip() ? particle.velocity.rotated(angle) : particle.velocity.rotated(-angle)); //randomly pick a deflection direction
-
-
 	}
 
-	else //just kill velocity for now
+	else //just kill velocity in direction of collision for now
 	{
-		particle.velocity = { 0,0 };
+		vec2 displacement = { coll_px.x - start_px.x, coll_px.y - start_px.y };
+		particle.velocity -= particle.velocity.project_along(displacement);
 	}
 }
 
 void WorldGrid::handle_ll_collision(pixel start_px, pixel coll_px)
 {
+	Particle& particle = grid[start_px.x][start_px.y];
+	Particle& collided_particle = grid[coll_px.x][coll_px.y];
+	
+	int in_def_angle = g_rand.rand_int(0, 30); //randomly choose a deflection angle -> liquids don't deflect as much when hitting other liquids
+
+	particle.velocity = .5f * (g_rand.flip() ? particle.velocity.rotated(in_def_angle) : particle.velocity.rotated(-in_def_angle)); //randomly pick a deflection direction
+
+
+	int out_def_angle = g_rand.rand_int(60, 90); //impacted liquids try to "move out of the way" by deflecting a lot
+
+	collided_particle.velocity += 0.5f * (g_rand.flip() ? particle.velocity.rotated(out_def_angle) : particle.velocity.rotated(-out_def_angle)); 
+	
+
+
 
 }
 
 void WorldGrid::handle_sl_collision(pixel start_px, pixel coll_px)
 {
+	Particle& particle = grid[start_px.x][start_px.y];
+	Particle& collided_particle = grid[coll_px.x][coll_px.y];
 
+	int in_def_angle = g_rand.rand_int(0, 30); //randomly choose a deflection angle -> liquids don't deflect as much when hitting other liquids
+
+	particle.velocity = .55f * (g_rand.flip() ? particle.velocity.rotated(in_def_angle) : particle.velocity.rotated(-in_def_angle)); //randomly pick a deflection direction
+
+
+	int out_def_angle = g_rand.rand_int(60, 90); //impacted liquids try to "move out of the way" by deflecting a lot
+
+	collided_particle.velocity += 0.5f * (g_rand.flip() ? particle.velocity.rotated(out_def_angle) : particle.velocity.rotated(-out_def_angle));
 }
 
 void WorldGrid::handle_ls_collision(pixel start_px, pixel coll_px)
 {
+	Particle& particle = grid[start_px.x][start_px.y];
+	Particle& collided_particle = grid[coll_px.x][coll_px.y];
+
+	//act like a slippery solid particle
+
+	int angle = g_rand.rand_int(30, 60); //randomly choose a deflection angle
+
+	particle.velocity = .25f * (g_rand.flip() ? particle.velocity.rotated(angle) : particle.velocity.rotated(-angle)); //randomly pick a deflection direction
+
+	if (!collided_particle.material->fixed())
+	{
+		collided_particle.velocity += 0.25f * particle.velocity; //impacted particle gets bumped as well
+	}
 
 }
 

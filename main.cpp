@@ -21,11 +21,11 @@ int main()
 
     for (int i = 0; i < line.size(); i++)
     {
-        world.insert_particle(line[i].x, line[i].y, MaterialID::sand);
+        world.insert_particle(line[i].x, line[i].y, MaterialID::water);
         world.insert_particle(line_1[i].x, line[i].y, MaterialID::sand);
-        world.insert_particle(line_2[i].x, line[i].y, MaterialID::sand);
+        world.insert_particle(line_2[i].x, line[i].y, MaterialID::water);
         world.insert_particle(line_3[i].x, line[i].y, MaterialID::sand);
-        world.insert_particle(line_4[i].x, line[i].y, MaterialID::sand);
+        world.insert_particle(line_4[i].x, line[i].y, MaterialID::water);
     }
 
     for (int i = 700; i <= 900; i++)
