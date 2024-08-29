@@ -13,11 +13,12 @@ using std::cout;
 using std::endl;
 
 
-WorldGrid::WorldGrid(int width, int height, float scale):
+WorldGrid::WorldGrid(int width, int height, float scale) :
 	_width(width),
 	_height(height),
 	_scale(scale),
-	mat_table(MaterialTable())
+	mat_table(MaterialTable()),
+	int_manager(InteractionManager(grid))
 {
 	rand_init(time(0));
 	grid.resize(width, vector<Particle>(height, Particle(mat_table[MaterialID::air])));
@@ -102,18 +103,19 @@ void WorldGrid::handle_ss_collision(pixel start_px, pixel coll_px)
 
 void WorldGrid::handle_ll_collision(pixel start_px, pixel coll_px)
 {
+	/*
 	Particle& particle = grid[start_px.x][start_px.y];
 	Particle& collided_particle = grid[coll_px.x][coll_px.y];
 	
-	int in_def_angle = g_rand.rand_int(0, 30); //randomly choose a deflection angle -> liquids don't deflect as much when hitting other liquids
+	int in_def_angle = g_rand.rand_int(40, 50); //randomly choose a deflection angle -> liquids don't deflect as much when hitting other liquids
 
 	particle.velocity = .5f * (g_rand.flip() ? particle.velocity.rotated(in_def_angle) : particle.velocity.rotated(-in_def_angle)); //randomly pick a deflection direction
 
 
-	int out_def_angle = g_rand.rand_int(60, 90); //impacted liquids try to "move out of the way" by deflecting a lot
+	int out_def_angle = g_rand.rand_int(40, 50); //impacted liquids try to "move out of the way" by deflecting a lot
 
 	collided_particle.velocity += 0.5f * (g_rand.flip() ? particle.velocity.rotated(out_def_angle) : particle.velocity.rotated(-out_def_angle)); 
-	
+	*/
 
 
 
@@ -254,6 +256,8 @@ void WorldGrid::update_particle(int x, int y)
 void WorldGrid::update(float last_time_step)
 {
 	time_step = last_time_step;
+
+	int_manager.manage_interactions(time_step);
 
 	for (int i = 0; i < _width; i++)
 	{

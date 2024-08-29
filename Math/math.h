@@ -27,6 +27,11 @@ struct vec2
 
 };
 
+inline vec2 operator-(const vec2& a)
+{
+	return { -a.x, -a.y };
+}
+
 inline vec2 operator+(const vec2& a, const vec2& b)
 {
 	return { a.x + b.x, a.y + b.y};
@@ -105,6 +110,17 @@ inline bool operator==(const pixel& a, const pixel& b)
 inline bool operator!=(const pixel& a, const pixel& b)
 {
 	return !(a == b);
+}
+
+inline bool operator<(const pixel& a, const pixel& b)
+{
+	return a.x < b.x || (a.x == b.x && a.y < b.y); //lexicographic order
+}
+
+
+inline bool operator<=(const pixel& a, const pixel& b)
+{
+	return a < b || a == b;
 }
 
 std::vector<pixel> compute_line(pixel start_px, pixel end_px); //returns all points on a (approximate) straight line from start to end, in order, always including start and end; line is guaranteed to fall in box defined by two pixels (i.e. no invalid pixels generated)

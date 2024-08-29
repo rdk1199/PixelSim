@@ -5,12 +5,14 @@
 #include <vector>
 
 #include "particle.h"
-
+#include "interaction.h"
 
 using std::vector; 
 
 class WorldGrid
 {
+
+private:
 	//fixed properties
 	int _width;
 	int _height;
@@ -19,6 +21,10 @@ class WorldGrid
 
 	vector<vector<Particle>> grid;
 	MaterialTable mat_table;
+
+
+	//managers
+	InteractionManager int_manager;
 
 	void update_particle(int x, int y);
 
@@ -58,7 +64,8 @@ public:
 	sf::Color get_px_col(int x, int y) const {return grid[x][y].color;} //returns the color of the particle at coordinate x,y
 	void insert_particle(int x, int y, MaterialID mat); //replaces the particle at (x,y) with a particle made of mat
 
-	
+	int width() const { return _width; }
+	int height() const { return _height; }
 
 	void update(float last_time_step); //updates all particles in the grid
 
